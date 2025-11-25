@@ -1,0 +1,44 @@
+{
+  "name": "reroot-auth-api",
+  "version": "1.0.0",
+  "description": "Multi-language authentication API for ReRoot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": ["authentication", "api", "multilingual", "nodejs", "express"],
+  "author": "ReRoot Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "nodemailer": "^6.9.7",
+    "i18next": "^23.7.6",
+    "i18next-fs-backend": "^2.3.1",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.1",
+    "@supabase/supabase-js": "^2.38.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/cors": "^2.8.17",
+    "@types/nodemailer": "^6.4.14",
+    "@types/uuid": "^9.0.7",
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
