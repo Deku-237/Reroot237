@@ -65,7 +65,7 @@ export interface Achievement {
 
 export interface Exercise {
   id: string;
-  type: 'translation' | 'multiple-choice' | 'audio' | 'matching';
+  type: 'translation' | 'multiple-choice' | 'pronunciation' | 'listening';
   question: string;
   options?: string[];
   correctAnswer: string;

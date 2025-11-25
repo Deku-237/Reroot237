@@ -21,13 +21,21 @@ export const SAMPLE_LESSONS: Record<string, Lesson[]> = {
         },
         {
           id: 'ex2',
+          type: 'pronunciation',
+          question: 'Practice pronouncing this Fulfulde greeting',
+          correctAnswer: 'A jam tan',
+          audioUrl: 'https://cdn.pixabay.com/download/audio/2021/08/03/audio_c8c97e8e0e.mp3',
+          explanation: 'This is how native speakers pronounce the greeting'
+        },
+        {
+          id: 'ex3',
           type: 'translation',
           question: 'Translate "Good morning" to Fulfulde',
           correctAnswer: 'Jam waali',
           explanation: 'Jam waali (or Jam waaliyé) is used to greet someone in the morning'
         },
         {
-          id: 'ex3',
+          id: 'ex4',
           type: 'multiple-choice',
           question: 'What is the typical response to "A jam tan"?',
           options: ['Jam tan', 'Alhamdulillah', 'Baaba', 'Waali'],
