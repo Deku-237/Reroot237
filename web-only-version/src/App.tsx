@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Settings, Trophy, Flame, LogOut } from 'lucide-react';
-import { useAuth } from './hooks/useAuth';
-import AuthWrapper from './components/auth/AuthWrapper';
+import { Trophy, Flame } from 'lucide-react';
 import HomePage from './components/HomePage';
 import LessonInterface from './components/LessonInterface';
 import ProgressDashboard from './components/ProgressDashboard';
@@ -16,13 +14,11 @@ import { LEARNING_PATHS, EMPTY_LEARNING_PATH } from './data/lessons';
 import { LanguageAPI } from './api/languageAPI';
 
 function App() {
-  const { user, logout } = useAuth();
   const [currentView, setCurrentView] = useState<'home' | 'lesson' | 'progress' | 'languages' | 'roadmap'>('home');
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
   const [userProgress, setUserProgress] = useState<UserProgress>(getInitialProgress());
   const [currentLesson, setCurrentLesson] = useState<CurrentLesson | null>(null);
   const [languageLessons, setLanguageLessons] = useState<Lesson[]>([]);
-  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem('selectedLanguage');
@@ -133,14 +129,8 @@ function App() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    setShowUserMenu(false);
-  };
-
   return (
-    <AuthWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -164,33 +154,6 @@ function App() {
               <div className="flex items-center space-x-2 text-african-orange">
                 <Trophy className="w-5 h-5" />
                 <span className="font-bold">{userProgress.totalXP}</span>
-              </div>
-              
-              {/* User Menu */}
-              <div className="relative">
-                <button 
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 p-2 text-gray-600 hover:text-gray-800 transition-colors rounded-lg hover:bg-gray-100"
-                >
-                  <User className="w-5 h-5" />
-                  <span className="text-sm font-medium">{user?.name}</span>
-                </button>
-                
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-800">{user?.name}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
-                    </div>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -256,7 +219,6 @@ function App() {
           )}
         </main>
       </div>
-    </AuthWrapper>
   );
 }
 
