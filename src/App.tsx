@@ -12,6 +12,8 @@ import { getInitialProgress, updateUserProgress } from './utils/progressManager'
 import { AVAILABLE_LANGUAGES } from './data/languages';
 import { LEARNING_PATHS, EMPTY_LEARNING_PATH } from './data/lessons';
 import { LanguageAPI } from './api/languageAPI';
+import { progressService } from './services/progressService';
+import { supabase } from './config/supabase';
 
 function App() {
   const [currentView, setCurrentView] = useState<'home' | 'lesson' | 'progress' | 'languages' | 'roadmap'>('home');
@@ -19,25 +21,62 @@ function App() {
   const [userProgress, setUserProgress] = useState<UserProgress>(getInitialProgress());
   const [currentLesson, setCurrentLesson] = useState<CurrentLesson | null>(null);
   const [languageLessons, setLanguageLessons] = useState<Lesson[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [lessonStartTime, setLessonStartTime] = useState<number>(0);
 
   useEffect(() => {
+    const initializeUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+        await loadProgressFromDatabase(user.id);
+      }
+    };
+
+    initializeUser();
+
     const savedLanguage = localStorage.getItem('selectedLanguage');
     const savedProgress = localStorage.getItem('userProgress');
-    
+
     if (savedLanguage) {
       const language = AVAILABLE_LANGUAGES.find(lang => lang.id === savedLanguage);
       if (language) setSelectedLanguage(language);
     }
-    
+
     if (savedProgress) {
       const parsed = JSON.parse(savedProgress);
-      // Ensure languageScores exists
       if (!parsed.languageScores) {
         parsed.languageScores = {};
       }
       setUserProgress(parsed);
     }
   }, []);
+
+  const loadProgressFromDatabase = async (uid: string) => {
+    const languageProgressData = await progressService.getAllLanguageProgress(uid);
+    const userProgressData = await progressService.getUserProgress(uid);
+
+    if (userProgressData || Object.keys(languageProgressData).length > 0) {
+      setUserProgress(prev => ({
+        ...prev,
+        totalXP: userProgressData?.total_xp || prev.totalXP,
+        currentLevel: userProgressData?.current_level || prev.currentLevel,
+        streak: userProgressData?.streak || prev.streak,
+        languageScores: Object.entries(languageProgressData).reduce((acc, [langId, progress]) => ({
+          ...acc,
+          [langId]: {
+            languageId: langId,
+            totalXP: progress.total_xp,
+            level: progress.level,
+            completedUnits: [],
+            currentUnit: progress.current_unit,
+            accuracy: progress.accuracy,
+            streakInLanguage: progress.streak
+          }
+        }), {} as Record<string, LanguageScore>)
+      }));
+    }
+  };
 
   useEffect(() => {
     if (selectedLanguage) {
@@ -80,10 +119,9 @@ function App() {
     setCurrentView('home');
   };
 
-  const handleLessonComplete = (earnedXP: number, isCorrect: boolean) => {
+  const handleLessonComplete = async (earnedXP: number, isCorrect: boolean) => {
     const newProgress = updateUserProgress(userProgress, earnedXP, isCorrect);
-    
-    // Update language-specific score
+
     if (selectedLanguage) {
       const languageScore = newProgress.languageScores[selectedLanguage.id] || {
         languageId: selectedLanguage.id,
@@ -94,23 +132,37 @@ function App() {
         accuracy: 0,
         streakInLanguage: 0
       };
-      
+
       const updatedLanguageScore = {
         ...languageScore,
         totalXP: languageScore.totalXP + earnedXP,
         level: Math.floor((languageScore.totalXP + earnedXP) / 100) + 1,
         accuracy: Math.round(((languageScore.accuracy * languageScore.totalXP) + (isCorrect ? earnedXP : 0)) / (languageScore.totalXP + earnedXP))
       };
-      
+
       newProgress.languageScores[selectedLanguage.id] = updatedLanguageScore;
     }
-    
+
     setUserProgress(newProgress);
     localStorage.setItem('userProgress', JSON.stringify(newProgress));
+
+    if (userId && currentLesson && selectedLanguage) {
+      const timeSpent = Math.floor((Date.now() - lessonStartTime) / 1000);
+      await progressService.saveLessonCompletion(userId, {
+        lesson_id: currentLesson.id,
+        language_id: selectedLanguage.id,
+        score: isCorrect ? 100 : 0,
+        xp_earned: earnedXP,
+        time_spent: timeSpent
+      });
+
+      await progressService.updateUserProgress(userId, earnedXP, isCorrect);
+    }
   };
 
   const handleStartLesson = (lesson: CurrentLesson) => {
     setCurrentLesson(lesson);
+    setLessonStartTime(Date.now());
     setCurrentView('lesson');
   };
 

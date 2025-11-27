@@ -11,6 +11,25 @@ export default {
         'forest-green': '#228B22',
         'kente-purple': '#8B4513',
         'ndop-blue': '#4682B4',
+        'duo-green': {
+          '400': '#58CC02',
+          '500': '#58CC02',
+          '600': '#4CAF00',
+        },
+        'duo-blue': {
+          '50': '#E3F2FD',
+          '100': '#BBDEFB',
+          '500': '#1CB0F6',
+        },
+      },
+      animation: {
+        'fadeIn': 'fadeIn 0.3s ease-in-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(-10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       fontFamily: {
         'african': ['Inter', 'system-ui', 'sans-serif'],
