@@ -43,32 +43,36 @@ function App() {
     if (selectedLanguage) {
       const fetchLessons = async () => {
         const lessons = await LanguageAPI.getLessons(selectedLanguage.id);
+        console.log('Fetched lessons for', selectedLanguage.id, ':', lessons);
         setLanguageLessons(lessons);
       };
       fetchLessons();
-      
+
       // Initialize language score if it doesn't exist
-      if (!userProgress.languageScores[selectedLanguage.id]) {
-        const newProgress = {
-          ...userProgress,
-          languageScores: {
-            ...userProgress.languageScores,
-            [selectedLanguage.id]: {
-              languageId: selectedLanguage.id,
-              totalXP: 0,
-              level: 1,
-              completedUnits: [],
-              currentUnit: 0,
-              accuracy: 0,
-              streakInLanguage: 0
+      setUserProgress((prevProgress) => {
+        if (!prevProgress.languageScores[selectedLanguage.id]) {
+          const newProgress = {
+            ...prevProgress,
+            languageScores: {
+              ...prevProgress.languageScores,
+              [selectedLanguage.id]: {
+                languageId: selectedLanguage.id,
+                totalXP: 0,
+                level: 1,
+                completedUnits: [],
+                currentUnit: 0,
+                accuracy: 0,
+                streakInLanguage: 0
+              }
             }
-          }
-        };
-        setUserProgress(newProgress);
-        localStorage.setItem('userProgress', JSON.stringify(newProgress));
-      }
+          };
+          localStorage.setItem('userProgress', JSON.stringify(newProgress));
+          return newProgress;
+        }
+        return prevProgress;
+      });
     }
-  }, [selectedLanguage, userProgress.languageScores]);
+  }, [selectedLanguage]);
 
   const handleLanguageSelect = (language: Language) => {
     setSelectedLanguage(language);
