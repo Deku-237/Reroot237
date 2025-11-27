@@ -167,13 +167,11 @@ export const useSpeechRecognition = ({
         alert('Microphone access denied. Please allow microphone access in your browser settings.');
         setIsMicrophoneAvailable(false);
       } else if (event.error === 'network') {
-        console.error('Network error - speech recognition may not work on this connection');
-        alert('Speech recognition network error. This feature requires an internet connection and may not work on all networks. Try using a different network or browser.');
+        console.error('Network error - speech recognition requires internet connection');
       } else if (event.error === 'aborted') {
         console.log('Speech recognition aborted');
       } else {
         console.error('Unknown speech recognition error:', event.error);
-        alert(`Speech recognition error: ${event.error}. Please try again.`);
       }
     };
 

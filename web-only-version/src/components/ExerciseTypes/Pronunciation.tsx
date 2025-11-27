@@ -29,7 +29,7 @@ export default function PronunciationExercise({
   const [attemptCount, setAttemptCount] = useState(0);
   const [feedbackData, setFeedbackData] = useState<FeedbackData | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [useTextInput, setUseTextInput] = useState(false);
+  const [useTextInput, setUseTextInput] = useState(true);
   const [textInput, setTextInput] = useState('');
 
   const { transcript, isListening, isSupported, startListening, stopListening, resetTranscript } =
@@ -182,72 +182,61 @@ export default function PronunciationExercise({
       </div>
 
       {!hasSubmitted ? (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
           {!useTextInput ? (
-            <>
-              {isSupported ? (
+            <div className="text-center">
+              <button
+                onClick={isListening ? stopListening : startListening}
+                disabled={isAnalyzing}
+                className={`
+                  w-20 h-20 rounded-full mx-auto flex items-center justify-center
+                  transition-all duration-200 font-semibold text-white
+                  ${isListening ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-blue-500 hover:bg-blue-600'}
+                  ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
+              >
+                {isListening ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
+              </button>
+              <p className="mt-4 text-gray-700">
+                {isAnalyzing
+                  ? 'Analyzing your pronunciation...'
+                  : isListening
+                  ? 'Listening... Speak now!'
+                  : 'Click the mic to start speaking'}
+              </p>
+              {transcript && (
                 <>
-                  <button
-                    onClick={isListening ? stopListening : startListening}
-                    disabled={isAnalyzing}
-                    className={`
-                      w-20 h-20 rounded-full mx-auto flex items-center justify-center
-                      transition-all duration-200 font-semibold text-white
-                      ${isListening ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-blue-500 hover:bg-blue-600'}
-                      ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : ''}
-                    `}
-                  >
-                    {isListening ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
-                  </button>
-                  <p className="mt-4 text-gray-700">
-                    {isAnalyzing
-                      ? 'Analyzing your pronunciation...'
-                      : isListening
-                      ? 'Listening... Speak now!'
-                      : 'Click the mic to start speaking'}
+                  <p className="mt-2 text-sm text-gray-600">
+                    You said: <span className="font-semibold">{transcript}</span>
                   </p>
-                  {transcript && (
-                    <>
-                      <p className="mt-2 text-sm text-gray-600">
-                        You said: <span className="font-semibold">{transcript}</span>
-                      </p>
-                      <button
-                        onClick={handleAnalyze}
-                        disabled={isAnalyzing}
-                        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Check Pronunciation
-                      </button>
-                    </>
-                  )}
                   <button
-                    onClick={() => setUseTextInput(true)}
-                    className="mt-4 text-sm text-blue-600 hover:text-blue-700 underline"
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing}
+                    className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Voice not working? Type instead
+                    Check Pronunciation
                   </button>
                 </>
-              ) : (
-                <div className="text-center">
-                  <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-3" />
-                  <p className="text-gray-700 mb-4">Speech recognition is not available in your browser.</p>
-                  <button
-                    onClick={() => setUseTextInput(true)}
-                    className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
-                  >
-                    Use Text Input Instead
-                  </button>
-                </div>
               )}
-            </>
+              <button
+                onClick={() => setUseTextInput(true)}
+                className="mt-4 text-sm text-blue-600 hover:text-blue-700 underline"
+              >
+                Voice not working? Type instead
+              </button>
+            </div>
           ) : (
             <div>
-              <p className="text-gray-700 mb-4">Type what you would say:</p>
+              <p className="text-gray-700 mb-2 text-center">Type the phrase to practice pronunciation:</p>
+              <p className="text-sm text-gray-500 mb-4 text-center">
+                (Voice recognition is experimental and may not work on all networks)
+              </p>
               <input
                 type="text"
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
                 placeholder="Type your answer here..."
+                autoFocus
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center text-lg mb-4"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter' && textInput.length > 0) {
@@ -269,9 +258,10 @@ export default function PronunciationExercise({
                       setUseTextInput(false);
                       setTextInput('');
                     }}
-                    className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold"
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm flex items-center gap-2"
                   >
-                    Use Voice
+                    <Mic className="w-4 h-4" />
+                    Try Voice Instead
                   </button>
                 )}
               </div>
