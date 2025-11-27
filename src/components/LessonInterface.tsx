@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, ChevronRight, Heart } from 'lucide-react';
 import { CurrentLesson } from '../types';
-import DuoPartner from './DuoPartner';
+import VuduMask from './VuduMask';
 import MultipleChoice from './ExerciseTypes/MultipleChoice';
 import Translation from './ExerciseTypes/Translation';
 import Pronunciation from './ExerciseTypes/Pronunciation';
@@ -86,9 +86,9 @@ export default function LessonInterface({ lesson, onComplete, onExit, language }
           {!showResult ? (
             <div>
               <div className="flex items-start space-x-6 mb-8">
-                <DuoPartner
-                  emotion={currentExerciseIndex === 0 ? 'happy' : 'encouraging'}
-                  size="lg"
+                <VuduMask
+                  emotion={currentExerciseIndex === 0 ? 'default' : 'encouraging'}
+                  size="xl"
                   animated={currentExerciseIndex === 0}
                 />
                 <div className="flex-1">
@@ -144,9 +144,9 @@ export default function LessonInterface({ lesson, onComplete, onExit, language }
           ) : (
             <div className="text-center">
               <div className="flex justify-center mb-6">
-                <DuoPartner
-                  emotion={isCorrect ? 'celebrating' : 'thinking'}
-                  size="lg"
+                <VuduMask
+                  emotion={isCorrect ? 'celebrating' : 'freaked-out'}
+                  size="xxl"
                   animated={true}
                 />
               </div>
